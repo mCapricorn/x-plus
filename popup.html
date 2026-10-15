@@ -1,0 +1,104 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width,initial-scale=1">
+<title>xClick</title>
+<style>
+:root{color-scheme:dark;font:14px/1.5 Inter,-apple-system,BlinkMacSystemFont,"Segoe UI",sans-serif}
+body{width:280px;margin:0;padding:18px;background:#080b16;color:#eafcff}
+.brand{display:flex;align-items:center;gap:10px;margin-bottom:12px}
+.logo{display:grid;place-items:center;width:34px;height:34px;border:1px solid #00f6ff;border-radius:10px;color:white;font-weight:900;font-style:italic;box-shadow:0 0 14px #00f6ff55}
+h1{font-size:17px;margin:0;letter-spacing:.5px}
+p{font-size:12px;color:#9ab2c4;margin:0 0 14px}
+.tag{display:inline-block;color:#00f6ff;border:1px solid #00f6ff55;border-radius:99px;padding:3px 8px;font-size:10px;letter-spacing:1px;margin-bottom:10px}
+.row{display:flex;gap:9px;align-items:center;border:1px solid #26354b;border-radius:11px;padding:10px;margin-top:8px;background:linear-gradient(135deg,#111a2b,#0b1020)}
+.icon{width:28px;height:28px;display:grid;place-items:center;border-radius:8px;background:#ff2bd61a;color:#ff65e4;font-size:16px;flex-shrink:0}
+.row strong{display:block;font-size:12px}
+.row small{display:block;color:#9ab2c4;font-size:10px}
+.note{border-top:1px solid #26354b;padding-top:12px;margin-top:14px;font-size:10px;color:#8197a8}
+
+/* ── Sound settings ─────────────────────────── */
+.settings{border-top:1px solid #26354b;margin-top:14px;padding-top:12px}
+.settings h2{font-size:11px;letter-spacing:1.5px;color:#00f6ff;margin:0 0 10px;text-transform:uppercase;font-weight:700}
+.ctl{display:flex;align-items:center;justify-content:space-between;gap:10px;margin-top:8px;font-size:12px}
+.ctl label{color:#cfe3ef;cursor:pointer;user-select:none}
+.switch{position:relative;width:34px;height:18px;flex-shrink:0}
+.switch input{opacity:0;width:0;height:0;position:absolute}
+.switch .track{position:absolute;inset:0;background:#26354b;border-radius:99px;transition:background .15s;cursor:pointer}
+.switch .track::after{content:'';position:absolute;top:2px;left:2px;width:14px;height:14px;border-radius:50%;background:#9ab2c4;transition:transform .15s,background .15s}
+.switch input:checked + .track{background:#00f6ff33;box-shadow:inset 0 0 0 1px #00f6ff}
+.switch input:checked + .track::after{transform:translateX(16px);background:#00f6ff;box-shadow:0 0 8px #00f6ff}
+input[type=range]{-webkit-appearance:none;appearance:none;width:130px;height:4px;background:#26354b;border-radius:99px;outline:none;cursor:pointer}
+input[type=range]::-webkit-slider-thumb{-webkit-appearance:none;appearance:none;width:14px;height:14px;border-radius:50%;background:#00f6ff;box-shadow:0 0 8px #00f6ff;border:none;cursor:pointer}
+input[type=range]::-moz-range-thumb{width:14px;height:14px;border-radius:50%;background:#00f6ff;box-shadow:0 0 8px #00f6ff;border:none;cursor:pointer}
+input:disabled{opacity:.45;cursor:not-allowed}
+.test{background:#00f6ff1a;border:1px solid #00f6ff55;color:#00f6ff;border-radius:8px;padding:5px 10px;font-size:11px;letter-spacing:.5px;cursor:pointer;font-family:inherit;transition:background .15s}
+.test:hover{background:#00f6ff33}
+.testRow{display:flex;gap:6px;margin-top:10px}
+.testRow .test{flex:1}
+.volPct{color:#00f6ff;font-size:11px;min-width:34px;text-align:right;font-variant-numeric:tabular-nums}
+select{width:132px;background:#121b2d;color:#eafcff;border:1px solid #26354b;border-radius:8px;padding:6px 8px;font:inherit}
+.hint{margin-top:10px;font-size:10px;color:#89a1b4;line-height:1.4}
+</style>
+</head>
+<body>
+<div class="brand"><div class="logo">X</div><div><h1>xClick</h1><div style="font-size:10px;color:#00f6ff;letter-spacing:1.2px">INTERACTION FX FOR X</div></div></div>
+<span class="tag">ACTIVE ON X</span>
+<p>Neon feedback for the moments you like, follow, and reply.</p>
+<div class="row"><div class="icon">♥</div><div><strong>Like</strong><small>Neon heart burst + N pulse</small></div></div>
+<div class="row"><div class="icon">＋</div><div><strong>Follow</strong><small>Cyber rings + particle burst</small></div></div>
+<div class="row"><div class="icon">↳</div><div><strong>Reply / comment</strong><small>Glitch signal + scanline</small></div></div>
+
+<div class="settings">
+  <h2>Extension</h2>
+  <div class="ctl">
+    <label for="fxOn">Enable effects</label>
+    <span class="switch">
+      <input type="checkbox" id="fxOn">
+      <span class="track"></span>
+    </span>
+  </div>
+  <div class="ctl">
+    <label for="visualMode">Visual mode</label>
+    <select id="visualMode">
+      <option value="classic">Classic</option>
+      <option value="alt">Alt</option>
+      <option value="rotate">Rotate</option>
+    </select>
+  </div>
+
+  <h2>Sound</h2>
+  <div class="ctl">
+    <label for="sndOn">Enable sounds</label>
+    <span class="switch">
+      <input type="checkbox" id="sndOn">
+      <span class="track"></span>
+    </span>
+  </div>
+  <div class="ctl">
+    <label for="sndVol">Volume</label>
+    <input type="range" id="sndVol" min="0" max="100" step="1">
+    <span class="volPct" id="sndVolPct">15%</span>
+  </div>
+  <div class="ctl">
+    <label for="soundMode">Sound mode</label>
+    <select id="soundMode">
+      <option value="classic">Classic</option>
+      <option value="alt">Alt</option>
+      <option value="rotate">Rotate</option>
+    </select>
+  </div>
+  <div class="testRow">
+    <button class="test" data-kind="like">♥ Like</button>
+    <button class="test" data-kind="follow">＋ Follow</button>
+    <button class="test" data-kind="reply">↳ Reply</button>
+  </div>
+  <div class="hint">Shortcuts: L like, R reply, F follow the current profile or nearby follow action. Rotate mode alternates between multiple visual and audio variants.</div>
+</div>
+
+<div class="note">Visual effects only; actions remain under X's control. Reduced-motion preferences are respected.</div>
+
+<script src="popup.js"></script>
+</body>
+</html>
