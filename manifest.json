@@ -1,8 +1,16 @@
 {
   "manifest_version": 3,
   "name": "xClick",
+  "short_name": "xClick",
   "version": "0.4.1",
   "description": "Interaction effects, keyboard-triggered feedback, and synthesized sound variants for likes, follows, and replies on X.",
+  "homepage_url": "https://github.com/mCapricorn/xClick",
+  "icons": {
+    "16": "assets/icons/icon-16.png",
+    "32": "assets/icons/icon-32.png",
+    "48": "assets/icons/icon-48.png",
+    "128": "assets/icons/icon-128.png"
+  },
   "permissions": ["storage"],
   "host_permissions": ["https://x.com/*", "https://twitter.com/*"],
   "content_scripts": [{
@@ -10,5 +18,12 @@
     "js": ["content.js"],
     "run_at": "document_idle"
   }],
-  "action": { "default_title": "xClick", "default_popup": "popup.html" }
+  "action": {
+    "default_title": "xClick",
+    "default_popup": "popup.html",
+    "default_icon": {
+      "16": "assets/icons/icon-16.png",
+      "32": "assets/icons/icon-32.png"
+    }
+  }
 }

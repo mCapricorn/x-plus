@@ -23,6 +23,9 @@ All sounds are synthesized at runtime with the Web Audio API. No audio files or 
 4. Select this project folder.
 5. Refresh x.com.
 
+## Privacy
+- Privacy policy: https://github.com/mCapricorn/xClick/blob/main/PRIVACY_POLICY.md
+
 ## Release
 - Current version: 0.4.1
 - Suggested release tag: v0.4.1
