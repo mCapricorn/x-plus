@@ -1,7 +1,7 @@
 {
   "manifest_version": 3,
   "name": "xClick",
-  "version": "0.4.0",
+  "version": "0.4.1",
   "description": "Interaction effects, keyboard-triggered feedback, and synthesized sound variants for likes, follows, and replies on X.",
   "permissions": ["storage"],
   "host_permissions": ["https://x.com/*", "https://twitter.com/*"],

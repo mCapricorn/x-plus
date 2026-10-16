@@ -24,9 +24,13 @@ All sounds are synthesized at runtime with the Web Audio API. No audio files or 
 5. Refresh x.com.
 
 ## Release
-- Current version: 0.4.0
-- Suggested release tag: v0.4.0
-- Suggested release asset: xclick-v0.4.0.zip
+- Current version: 0.4.1
+- Suggested release tag: v0.4.1
+- Suggested release asset: xclick-v0.4.1.zip
+
+### 0.4.1
+- Fix clicks on the Enable effects and Enable sounds switch tracks.
+- Add visible keyboard focus and disabled styling for switches.
 
 ## Notes
 - Effects are decorative only and do not automate any X action.
