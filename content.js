@@ -7,24 +7,47 @@
     fxEnabled: true,
     soundEnabled: !reduceMotion,
     soundVolume: 0.15,
-    visualMode: 'rotate',
-    soundMode: 'rotate'
+    animationEnabled: { like: true, follow: true, reply: true, comment: true },
+    visualModes: { like: 'rotate', follow: 'rotate', reply: 'rotate', comment: 'rotate' },
+    soundMode: 'rotate',
+    theme: 'cyber',
+    themePrimary: '#00f6ff',
+    themeAccent: '#ff2bd6'
+  };
+  const palettes = {
+    cyber: ['#00f6ff', '#ff2bd6'],
+    aurora: ['#7bffd6', '#9a7bff'],
+    sakura: ['#ff8fae', '#ffe178'],
+    mono: ['#f5f5f5', '#929bab']
+  };
+  const validHex = value => typeof value === 'string' && /^#[0-9a-f]{6}$/i.test(value);
+  const applyTheme = values => {
+    const theme = ['cyber', 'aurora', 'sakura', 'mono', 'custom'].includes(values.xc_theme) ? values.xc_theme : 'cyber';
+    const [primary, accent] = theme === 'custom' && validHex(values.xc_theme_primary) && validHex(values.xc_theme_accent)
+      ? [values.xc_theme_primary, values.xc_theme_accent]
+      : (palettes[theme] || palettes.cyber);
+    state.theme = theme;
+    state.themePrimary = primary;
+    state.themeAccent = accent;
+    layer.style.setProperty('--xp-primary', primary);
+    layer.style.setProperty('--xp-accent', accent);
   };
   const rotation = {
-    visual: { like: 0, follow: 0, reply: 0 },
+    visual: { like: 0, follow: 0, reply: 0, comment: 0 },
     sound: { like: 0, follow: 0, reply: 0 }
   };
   const style = document.createElement('style');
   style.textContent = `
   #xp-fx-layer{position:fixed;inset:0;z-index:2147483647;pointer-events:none;overflow:hidden;font-family:Inter,-apple-system,BlinkMacSystemFont,"Segoe UI",sans-serif}
   .xp-fx{position:fixed;pointer-events:none;transform:translate(-50%,-50%);font-weight:900;white-space:nowrap}
-  .xp-label{font-size:10px;letter-spacing:1.5px;color:#eaffff;text-shadow:0 0 7px #00f6ff,0 0 16px #00f6ff,2px 0 #ff2bd6}
-  .xp-xglyph{font-size:30px;font-style:italic;color:#fff;text-shadow:0 0 6px #fff,0 0 14px #00f6ff,0 0 26px #00f6ff,2px 2px #ff2bd6}
-  .xp-ring{position:fixed;border:2px solid #00f6ff;border-radius:50%;box-shadow:0 0 9px #00f6ff,inset 0 0 8px #00f6ff}
-  .xp-particle{position:fixed;width:5px;height:5px;background:#00f6ff;box-shadow:0 0 8px #00f6ff,0 0 14px #ff2bd6;transform:translate(-50%,-50%) rotate(45deg)}
-  .xp-heart{font-size:24px;color:#ff2bd6;text-shadow:0 0 7px #ff2bd6,0 0 18px #ff2bd6}
-  .xp-glitch{font-size:11px;letter-spacing:1.5px;color:#fff;text-shadow:2px 0 #ff2bd6,-2px 0 #00f6ff}
-  .xp-scan{position:fixed;height:2px;background:linear-gradient(90deg,transparent,#00f6ff,#ff2bd6,transparent);box-shadow:0 0 12px #00f6ff}
+  #xp-fx-layer{--xp-primary:#00f6ff;--xp-accent:#ff2bd6}
+  .xp-label{font-size:10px;letter-spacing:1.5px;color:#eaffff;text-shadow:0 0 7px var(--xp-primary),0 0 16px var(--xp-primary),2px 0 var(--xp-accent)}
+  .xp-xglyph{font-size:30px;font-style:italic;color:#fff;text-shadow:0 0 6px #fff,0 0 14px var(--xp-primary),0 0 26px var(--xp-primary),2px 2px var(--xp-accent)}
+  .xp-ring{position:fixed;border:2px solid var(--xp-primary);border-radius:50%;box-shadow:0 0 9px var(--xp-primary),inset 0 0 8px var(--xp-primary)}
+  .xp-particle{position:fixed;width:5px;height:5px;background:var(--xp-primary);box-shadow:0 0 8px var(--xp-primary),0 0 14px var(--xp-accent);transform:translate(-50%,-50%) rotate(45deg)}
+  .xp-heart{font-size:24px;color:var(--xp-accent);text-shadow:0 0 7px var(--xp-accent),0 0 18px var(--xp-accent)}
+  .xp-glitch{font-size:11px;letter-spacing:1.5px;color:#fff;text-shadow:2px 0 var(--xp-accent),-2px 0 var(--xp-primary)}
+  .xp-scan{position:fixed;height:2px;background:linear-gradient(90deg,transparent,var(--xp-primary),var(--xp-accent),transparent);box-shadow:0 0 12px var(--xp-primary)}
   @keyframes xp-pop{0%{opacity:0;transform:translate(-50%,-50%) scale(.25) rotate(-12deg)}22%{opacity:1;transform:translate(-50%,-65%) scale(1.12) rotate(3deg)}70%{opacity:1;transform:translate(-50%,-90%) scale(1)}100%{opacity:0;transform:translate(-50%,-145%) scale(.8)}}
   @keyframes xp-ring{0%{opacity:1;transform:translate(-50%,-50%) scale(.25)}100%{opacity:0;transform:translate(-50%,-50%) scale(2.8)}}
   @keyframes xp-particle{0%{opacity:1;transform:translate(-50%,-50%) rotate(45deg) scale(1)}100%{opacity:0;transform:translate(calc(-50% + var(--dx)),calc(-50% + var(--dy))) rotate(225deg) scale(.1)}}
@@ -52,7 +75,12 @@
     else if (typeof res.np_sound_enabled === 'boolean') state.soundEnabled = res.np_sound_enabled;
     if (typeof res.xc_sound_volume === 'number') state.soundVolume = Math.min(1, Math.max(0, res.xc_sound_volume));
     else if (typeof res.np_sound_volume === 'number') state.soundVolume = Math.min(1, Math.max(0, res.np_sound_volume));
-    state.visualMode = clampMode(res.xc_visual_mode);
+    const legacyVisualMode = clampMode(res.xc_visual_mode);
+    for (const kind of ['like', 'follow', 'reply', 'comment']) {
+      const enabled = res[`xc_animation_${kind}_enabled`];
+      if (typeof enabled === 'boolean') state.animationEnabled[kind] = enabled;
+      state.visualModes[kind] = clampMode(res[`xc_visual_mode_${kind}`] ?? legacyVisualMode);
+    }
     state.soundMode = clampMode(res.xc_sound_mode);
   };
 
@@ -60,19 +88,27 @@
     chrome.storage.local.get([
       'xc_fx_enabled',
       'xc_visual_mode',
+      ...['like', 'follow', 'reply', 'comment'].flatMap(kind => [`xc_animation_${kind}_enabled`, `xc_visual_mode_${kind}`]),
       'xc_sound_enabled',
       'xc_sound_volume',
       'xc_sound_mode',
       'np_sound_enabled',
-      'np_sound_volume'
-    ], res => applyStoredState(res));
+      'np_sound_volume',
+      'xc_theme', 'xc_theme_primary', 'xc_theme_accent'
+    ], res => { applyStoredState(res); applyTheme(res); });
     chrome.storage.onChanged.addListener((changes, area) => {
       if (area !== 'local') return;
       if (changes.xc_fx_enabled) state.fxEnabled = !!changes.xc_fx_enabled.newValue;
-      if (changes.xc_visual_mode) state.visualMode = clampMode(changes.xc_visual_mode.newValue);
+      for (const kind of ['like', 'follow', 'reply', 'comment']) {
+        if (changes[`xc_animation_${kind}_enabled`]) state.animationEnabled[kind] = !!changes[`xc_animation_${kind}_enabled`].newValue;
+        if (changes[`xc_visual_mode_${kind}`]) state.visualModes[kind] = clampMode(changes[`xc_visual_mode_${kind}`].newValue);
+      }
       if (changes.xc_sound_enabled) state.soundEnabled = !!changes.xc_sound_enabled.newValue;
       if (changes.xc_sound_volume) state.soundVolume = Math.min(1, Math.max(0, changes.xc_sound_volume.newValue));
       if (changes.xc_sound_mode) state.soundMode = clampMode(changes.xc_sound_mode.newValue);
+      if (changes.xc_theme || changes.xc_theme_primary || changes.xc_theme_accent) {
+        chrome.storage.local.get(['xc_theme', 'xc_theme_primary', 'xc_theme_accent'], applyTheme);
+      }
     });
   } catch (_) { /* chrome.storage unavailable */ }
 
@@ -178,31 +214,45 @@
       } catch (_) { /* never break FX if audio fails */ }
     };
 
-    return { play };
+    const unlock = () => {
+      try {
+        const c = ensureCtx();
+        if (c && c.state === 'suspended') {
+          const pending = c.resume();
+          if (pending && typeof pending.catch === 'function') pending.catch(() => {});
+        }
+      } catch (_) { /* audio unlock is best-effort */ }
+    };
+
+    return { play, unlock };
   })();
   // ── End sound module ──────────────────────────────────────────────────────
   const Effects = { isEnabled: () => state.fxEnabled };
-  function ring(x,y,color='#00f6ff',duration=650,size=24){const n=document.createElement('div');n.className='xp-ring';Object.assign(n.style,{left:x+'px',top:y+'px',width:size+'px',height:size+'px',borderColor:color,boxShadow:`0 0 9px ${color},inset 0 0 8px ${color}`,animation:`xp-ring ${duration}ms ease-out forwards`});add(n,duration);}
-  function burst(x,y,count=12){if(reduceMotion)return;for(let i=0;i<count;i++){const n=document.createElement('div');n.className='xp-particle';const a=2*Math.PI*i/count+Math.random()*.25,d=22+Math.random()*40;n.style.left=x+'px';n.style.top=y+'px';n.style.background=i%3===0?'#ff2bd6':'#00f6ff';n.style.setProperty('--dx',Math.cos(a)*d+'px');n.style.setProperty('--dy',Math.sin(a)*d+'px');const t=420+Math.random()*280;n.style.animation=`xp-particle ${t}ms ease-out forwards`;add(n,t);}}
+  function ring(x,y,color=state.themePrimary,duration=650,size=24){const n=document.createElement('div');n.className='xp-ring';Object.assign(n.style,{left:x+'px',top:y+'px',width:size+'px',height:size+'px',borderColor:color,boxShadow:`0 0 9px ${color},inset 0 0 8px ${color}`,animation:`xp-ring ${duration}ms ease-out forwards`});add(n,duration);}
+  function burst(x,y,count=12){if(reduceMotion)return;for(let i=0;i<count;i++){const n=document.createElement('div');n.className='xp-particle';const a=2*Math.PI*i/count+Math.random()*.25,d=22+Math.random()*40;n.style.left=x+'px';n.style.top=y+'px';n.style.background=i%3===0?state.themeAccent:state.themePrimary;n.style.setProperty('--dx',Math.cos(a)*d+'px');n.style.setProperty('--dy',Math.sin(a)*d+'px');const t=420+Math.random()*280;n.style.animation=`xp-particle ${t}ms ease-out forwards`;add(n,t);}}
   function text(value,x,y,cls='xp-label',duration=850){const n=document.createElement('div');n.className='xp-fx '+cls;n.textContent=value;n.style.left=x+'px';n.style.top=y+'px';n.style.animation=`xp-${cls==='xp-glitch'?'glitch':'pop'} ${duration}ms cubic-bezier(.2,.8,.2,1) forwards`;add(n,duration);}
-  function heart(x,y,dx,duration=900,color='#ff2bd6'){const h=document.createElement('div');h.className='xp-fx xp-heart';h.textContent='♥';h.style.left=x+'px';h.style.top=y+'px';h.style.color=color;h.style.textShadow=`0 0 7px ${color},0 0 18px ${color}`;h.style.setProperty('--dx',dx+'px');h.style.animation=`xp-heart ${duration}ms ease-out forwards`;add(h,duration);}
+  function heart(x,y,dx,duration=900,color=state.themeAccent){const h=document.createElement('div');h.className='xp-fx xp-heart';h.textContent='♥';h.style.left=x+'px';h.style.top=y+'px';h.style.color=color;h.style.textShadow=`0 0 7px ${color},0 0 18px ${color}`;h.style.setProperty('--dx',dx+'px');h.style.animation=`xp-heart ${duration}ms ease-out forwards`;add(h,duration);}
   const visualVariants = {
     like: [
-      r => {const x=r.left+r.width/2,y=r.top+r.height/2;ring(x,y,'#ff2bd6',560);ring(x,y,'#00f6ff',760);burst(x,y,13);heart(x,y,Math.random()>.5?25:-25,900,'#ff2bd6');text('♥ LIKED',x+28,y-8);},
-      r => {const x=r.left+r.width/2,y=r.top+r.height/2;ring(x,y,'#7cf7ff',620,20);ring(x,y,'#ff2bd6',860,34);burst(x,y,18);heart(x-10,y-2,-32,820,'#7cf7ff');heart(x+10,y-4,32,980,'#ff2bd6');text('HEART LINKED',x+22,y-10,'xp-label',920);}
+      r => {const x=r.left+r.width/2,y=r.top+r.height/2;ring(x,y,state.themeAccent,560);ring(x,y,state.themePrimary,760);burst(x,y,13);heart(x,y,Math.random()>.5?25:-25,900,state.themeAccent);text('♥ LIKED',x+28,y-8);},
+      r => {const x=r.left+r.width/2,y=r.top+r.height/2;ring(x,y,state.themePrimary,620,20);ring(x,y,state.themeAccent,860,34);burst(x,y,18);heart(x-10,y-2,-32,820,state.themePrimary);heart(x+10,y-4,32,980,state.themeAccent);text('HEART LINKED',x+22,y-10,'xp-label',920);}
     ],
     follow: [
-      r => {const x=r.left+r.width/2,y=r.top+r.height/2;ring(x,y,'#00f6ff',680,28);ring(x,y,'#ff2bd6',900,28);burst(x,y,16);text('＋ FOLLOWING',x+26,y-4,'xp-label',950);},
-      r => {const x=r.left+r.width/2,y=r.top+r.height/2;ring(x,y,'#7cf7ff',500,18);ring(x,y,'#00f6ff',760,26);ring(x,y,'#ff2bd6',980,38);burst(x,y,12);text('LOCKED ON',x+18,y-8,'xp-label',900);text('X',x-24,y-24,'xp-xglyph',700);}
+      r => {const x=r.left+r.width/2,y=r.top+r.height/2;ring(x,y,state.themePrimary,680,28);ring(x,y,state.themeAccent,900,28);burst(x,y,16);text('＋ FOLLOWING',x+26,y-4,'xp-label',950);},
+      r => {const x=r.left+r.width/2,y=r.top+r.height/2;ring(x,y,state.themePrimary,500,18);ring(x,y,state.themePrimary,760,26);ring(x,y,state.themeAccent,980,38);burst(x,y,12);text('LOCKED ON',x+18,y-8,'xp-label',900);text('X',x-24,y-24,'xp-xglyph',700);}
     ],
     reply: [
-      r => {const x=r.left+r.width/2,y=r.top+r.height/2;ring(x,y,'#00f6ff',680,26);burst(x,y,9);const scan=document.createElement('div');scan.className='xp-fx xp-scan';scan.style.left=Math.max(8,x-76)+'px';scan.style.top=y+'px';scan.style.width='152px';scan.style.animation='xp-scan 650ms ease-out forwards';add(scan,650);text('↳ SIGNAL SENT',x+10,y-7,'xp-glitch',850);text('N',x-28,y-27,'xp-xglyph',650);},
-      r => {const x=r.left+r.width/2,y=r.top+r.height/2;ring(x,y,'#ff2bd6',760,30);ring(x,y,'#00f6ff',540,18);burst(x,y,14);const scanTop=document.createElement('div');scanTop.className='xp-fx xp-scan';scanTop.style.left=Math.max(8,x-68)+'px';scanTop.style.top=(y-10)+'px';scanTop.style.width='136px';scanTop.style.animation='xp-scan 520ms ease-out forwards';add(scanTop,520);const scanBottom=document.createElement('div');scanBottom.className='xp-fx xp-scan';scanBottom.style.left=Math.max(8,x-68)+'px';scanBottom.style.top=(y+10)+'px';scanBottom.style.width='136px';scanBottom.style.animation='xp-scan 700ms ease-out forwards';add(scanBottom,700);text('REPLY UPLINK',x+18,y-10,'xp-glitch',920);text('X',x-22,y-25,'xp-xglyph',720);}
+      r => {const x=r.left+r.width/2,y=r.top+r.height/2;ring(x,y,state.themePrimary,680,26);burst(x,y,9);const scan=document.createElement('div');scan.className='xp-fx xp-scan';scan.style.left=Math.max(8,x-76)+'px';scan.style.top=y+'px';scan.style.width='152px';scan.style.animation='xp-scan 650ms ease-out forwards';add(scan,650);text('↳ SIGNAL SENT',x+10,y-7,'xp-glitch',850);text('N',x-28,y-27,'xp-xglyph',650);},
+      r => {const x=r.left+r.width/2,y=r.top+r.height/2;ring(x,y,state.themeAccent,760,30);ring(x,y,state.themePrimary,540,18);burst(x,y,14);const scanTop=document.createElement('div');scanTop.className='xp-fx xp-scan';scanTop.style.left=Math.max(8,x-68)+'px';scanTop.style.top=(y-10)+'px';scanTop.style.width='136px';scanTop.style.animation='xp-scan 520ms ease-out forwards';add(scanTop,520);const scanBottom=document.createElement('div');scanBottom.className='xp-fx xp-scan';scanBottom.style.left=Math.max(8,x-68)+'px';scanBottom.style.top=(y+10)+'px';scanBottom.style.width='136px';scanBottom.style.animation='xp-scan 700ms ease-out forwards';add(scanBottom,700);text('REPLY UPLINK',x+18,y-10,'xp-glitch',920);text('X',x-22,y-25,'xp-xglyph',720);}
+    ],
+    comment: [
+      r => {const x=r.left+r.width/2,y=r.top+r.height/2;ring(x,y,state.themePrimary,620,24);burst(x,y,12);text('COMMENT SENT',x+16,y-8,'xp-glitch',850);},
+      r => {const x=r.left+r.width/2,y=r.top+r.height/2;ring(x,y,state.themeAccent,700,30);ring(x,y,state.themePrimary,920,18);burst(x,y,18);const scan=document.createElement('div');scan.className='xp-fx xp-scan';scan.style.left=Math.max(8,x-76)+'px';scan.style.top=y+'px';scan.style.width='152px';scan.style.animation='xp-scan 580ms ease-out forwards';add(scan,580);text('POST UPLINK',x+18,y-9,'xp-glitch',920);text('X',x-22,y-25,'xp-xglyph',720);}
     ]
   };
-  function emit(kind, button){if(!button||!visible(button)||Date.now()-last<120)return;last=Date.now();const list=visualVariants[kind]||[];const variant=list[pickVariant(state.visualMode,'visual',kind,list.length)];if(!variant)return;variant(button.getBoundingClientRect());Sound.play(kind);}
+  function emit(kind, button){if(!button||!visible(button)||Date.now()-last<120)return;last=Date.now();const list=visualVariants[kind]||[];if(state.animationEnabled[kind]&&list.length){const variant=list[pickVariant(state.visualModes[kind],'visual',kind,list.length)];if(variant)variant(button.getBoundingClientRect());}Sound.play(kind==='comment'?'reply':kind);}
   function describeButton(button){if(!button)return { tid:'', text:'' };const tid=(button.getAttribute('data-testid')||'').toLowerCase();const text=[button.getAttribute('aria-label'),tid,button.getAttribute('title'),button.innerText].filter(Boolean).join(' ').toLowerCase().replace(/\s+/g,' ').trim();return { tid, text };}
-  function classifyButton(button){if(!(button instanceof Element)||!visible(button))return null;const { tid, text } = describeButton(button);if(/unlike|remove like/.test(text))return null;if(/(^|[\s_-])(like|favorite)([\s_-]|$)/.test(text)||/like this (post|tweet)/.test(text)||tid==='like')return {type:'like',button};if(/(^|[\s_-])follow([\s_-]|$)/.test(text)||/follow back/.test(text)||tid==='follow')return {type:'follow',button};if(/(^|[\s_-])(reply|replies)([\s_-]|$)|回复/.test(text)||/^tweetbutton(inline)?$/.test(tid)&&/reply|回复/.test(text)||tid==='reply')return {type:'reply',button};return null;}
+  function classifyButton(button){if(!(button instanceof Element)||!visible(button))return null;const { tid, text } = describeButton(button);if(/unlike|remove like/.test(text))return null;if(/(^|[\s_-])(like|favorite)([\s_-]|$)/.test(text)||/like this (post|tweet)/.test(text)||tid==='like')return {type:'like',button};if(/(^|[\s_-])follow([\s_-]|$)/.test(text)||/follow back/.test(text)||tid==='follow')return {type:'follow',button};if(tid==='tweetbutton')return {type:'comment',button};if(/(^|[\s_-])(reply|replies)([\s_-]|$)|回复/.test(text)||tid==='reply'||tid==='tweetbuttoninline')return {type:'reply',button};return null;}
   function detect(target){if(!(target instanceof Element))return null;let button=target.closest('button,[role="button"]');if(!button){const testNode=target.closest('[data-testid]');if(testNode){button=testNode.closest('button,[role="button"]');if(!button&&/^(like|reply|follow|tweetbutton|tweetbuttoninline)$/.test((testNode.getAttribute('data-testid')||'').toLowerCase()))button=testNode;}}return classifyButton(button);}
   const contextSelector='article,[data-testid="cellInnerDiv"],[role="dialog"],main,section';
   let lastPointerTarget=null;
@@ -211,5 +261,5 @@
   function findButtonIn(root, kind){if(!(root instanceof Element))return null;const nodes=root.querySelectorAll('button,[role="button"],[data-testid]');for(const node of nodes){const match=classifyButton(node);if(match&&match.type===kind)return match.button;}return null;}
   function findLikelyButton(kind){for(const root of uniqueRoots()){const button=findButtonIn(root,kind);if(button)return button;}return findButtonIn(document.body,kind);}
   function queueShortcut(kind){window.setTimeout(()=>{if(!Effects.isEnabled())return;const button=findLikelyButton(kind);if(button)emit(kind,button);},24);}
-  let last=0;document.addEventListener('mousemove',e=>{if(e.target instanceof Element)lastPointerTarget=e.target;},{capture:true,passive:true});document.addEventListener('click',e=>{if(!Effects.isEnabled())return;const m=detect(e.target);if(!m)return;emit(m.type,m.button);},true);document.addEventListener('keydown',e=>{if(!Effects.isEnabled()||e.defaultPrevented||e.repeat||e.altKey||e.ctrlKey||e.metaKey||isEditable(e.target))return;const key=(e.key||'').toLowerCase();if(key==='l')queueShortcut('like');else if(key==='r')queueShortcut('reply');else if(key==='f')queueShortcut('follow');},true);
+  let last=0;document.addEventListener('mousemove',e=>{if(e.target instanceof Element)lastPointerTarget=e.target;},{capture:true,passive:true});document.addEventListener('click',e=>{if(!Effects.isEnabled())return;const m=detect(e.target);if(!m)return;emit(m.type,m.button);},true);window.addEventListener('keydown',e=>{if(!Effects.isEnabled()||e.repeat||e.altKey||e.ctrlKey||e.metaKey||isEditable(e.target))return;const key=(e.key||'').toLowerCase();const kind=key==='l'?'like':key==='r'?'reply':key==='f'?'follow':null;if(!kind)return;if(state.soundEnabled&&state.soundVolume>0)Sound.unlock();queueShortcut(kind);},true);
 })();

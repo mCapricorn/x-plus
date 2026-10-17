@@ -2,8 +2,8 @@
   "manifest_version": 3,
   "name": "xClick",
   "short_name": "xClick",
-  "version": "0.4.1",
-  "description": "Interaction effects, keyboard-triggered feedback, and synthesized sound variants for likes, follows, and replies on X.",
+  "version": "0.4.4",
+  "description": "Customizable animation previews, color themes, keyboard-triggered feedback, and synthesized sounds for X interactions.",
   "homepage_url": "https://github.com/mCapricorn/xClick",
   "icons": {
     "16": "assets/icons/icon-16.png",

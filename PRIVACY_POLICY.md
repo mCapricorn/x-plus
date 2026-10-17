@@ -1,6 +1,6 @@
 # Privacy Policy for xClick
 
-Last updated: 2026-10-16
+Last updated: 2026-10-17
 
 xClick is a browser extension for Chrome and Edge that adds local visual and synthesized sound feedback to supported interactions on X.
 
@@ -22,6 +22,7 @@ These settings may include:
 - whether effects are enabled
 - whether sound is enabled
 - selected visual mode
+- selected color theme and its custom palette colors
 - selected sound mode
 - selected volume level
 
